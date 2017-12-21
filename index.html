@@ -19,7 +19,9 @@
     <script src="./js/medium-editor.min.js"></script>
     <script>
         var editor = new MediumEditor('.editable')
-        
+        editor.subscribe('editableInput', function (event, editable) {
+            console.log(event);
+        });
         
     </script>
 </body>
