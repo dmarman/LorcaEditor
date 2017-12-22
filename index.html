@@ -38,57 +38,17 @@
                 //console.log("space");                            
             }
 
+            let plainText = cleanText(editor.getContent());
 
-
-                        let sentences = $(".editable").blast({ 
-                    delimiter: "sentence",
-                });  
-            let words = $(".editable").blast({ 
-                    delimiter: "word",
-                    generateValueClass: true,
-                });  
-
-            //http://scielo.isciii.es/pdf/asisna/v31n2/original2.pdf
-            //https://github.com/cgiffard/TextStatistics.js
-            $('.editable').find('h2, h3, p, span').each(function(){$(this).append(" ")});
-            let plainText =editor.getContent().replace(/<(?:.|\n)*?>/gm, '');
             let statistics = silabas(plainText).statistics();
             let silabasArray = silabas(plainText).syllables();
-            let fernandez = 206.84 - 60*(silabasArray.length/words.length) - 1.02*(words.length/sentences.length);
-            let infz = 206.835 - 62.3*(silabasArray.length/words.length) - words.length/sentences.length;
-            let nivel = '';
-            let grado = '';
-            
-            if(infz > 0 && infz < 40){
-                nivel = "Muy difícil";
-                grado = "";
-            } else if (infz > 40 && infz < 55){
-                nivel ="Algo difícil";
-                grado = "";                
-            } else if (infz > 55 && infz < 65){
-                nivel ="Normal";
-                grado = "";                           
-            } else if (infz > 65 && infz < 80){
-                nivel ="Bastante fácil";
-                grado = "";
-            } else if (infz > 80){
-                nivel ="Muy fácil";
-                grado = "";                
-            } ;
+ 
 
             console.log({
-                "sentences": sentences.length,
-                "words": words.length,
+                "sentences": statistics.lines,
+                "words": statistics.words,
                 "syllabes": silabasArray.length,
-                "Fernández Huerta": fernandez,
-                "nivel": nivel,
-                "INFZ": infz
             });
-
-            $(".editable").blast(false);
-            
-            console.log(cleanText(editor.getContent()));
-
         });
 
         document.getElementById('correct-button').addEventListener('click', function(){
