@@ -91,7 +91,16 @@ blockquote {
     text-align: left;
     letter-spacing: 0;
     padding-top: 10px;
-    padding-left: 20px;
+    padding-left: 22px;
+    /*position: absolute;*/
+    float: left;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+.sub-logo {
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
 .column-wrapper {
@@ -110,7 +119,7 @@ blockquote {
 }
 
 .meter {
-    height: 2px;
+    height: 3px;
     position: relative;
     margin: 0 0 10px 0;
     background-color: #ebebeb;
@@ -122,10 +131,20 @@ blockquote {
     height: 100%;
     border-radius: 2px;
     background-color: rgb(43,194,83);
-
-
+    width: 100%;
     position: relative;
     overflow: hidden;
+}
+
+#save-status {
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 14px;
+    color: #a6a6a6;
+    line-height: 17px;
+    letter-spacing: 0.3px;
+    display: inline-block;
+    padding-top: 29px;
+    padding-left: 18px;
 }
 
 .medium-editor-placeholder:after {
@@ -175,3 +194,6 @@ blockquote {
     padding: 15px;
 }
 
+.blast {
+    background-color: #c1a425;
+}

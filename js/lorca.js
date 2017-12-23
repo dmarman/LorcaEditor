@@ -113,7 +113,7 @@ class Lorca {
         }
         this.infz.value = Math.round(infz);
         this.infz.level = level;
-        this.infz.percentage = 100*this.infz.value/146 + "%";
+        this.infz.percentage = Math.round(100*this.infz.value/146);
 
         return this;
     }

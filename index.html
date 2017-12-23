@@ -2,10 +2,10 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>medium editor | demo</title>
+    <title>Lorca | Editor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css" />
     <link rel="stylesheet" href="./css/medium-editor.min.css">
-    <link rel="stylesheet" href="./css/demo.css">    
+    <link rel="stylesheet" href="./css/demo.css">
     <link rel="stylesheet" href="./css/beagle.min.css" id="medium-editor-theme">
     <link href="https://fonts.googleapis.com/css?family=Merriweather:300,400" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
@@ -14,17 +14,19 @@
     <!--<button id="correct-button">Correct</button>-->
     <header>
         <div class="navbar">
-            <h1 class="app-logo">Lorca</h1>
+            <h1 class="app-logo">Lorca <span class="sub-logo">| Beta</span></h1>
+            <div id="save-status"></div>
         </div>
     </header>
     <div class="container" id="container">
-        <div class="side-column"></div>
+        <div class="side-column">
+        </div>
         <div id="caret" class="editable"></div>
         <div id="display" class="side-column">
             <div class="column-wrapper">
                 <div class="column-title">Legibilidad</div>
                 <div class="meter">
-                    <span id="progress-value" style="width: 25%"></span>
+                    <span id="progress-value"></span>
                 </div>
                 <div id="level">Muy fácil</div>
             </div>
@@ -38,14 +40,36 @@
     <script src="./js/jquery.min.js"></script>
     <script src="./js/jquery.blast.min.js"></script>
     <script src="./js/lorca.js"></script>
+    <script type="text/javascript" src="./js/auto-style.js"></script>
 
     <script>
         var timeoutId;
         var editor = new MediumEditor('.editable', {
             placeholder: {
                 text: 'Escribe aquí'
+            },
+            extensions: {
+                'auto-highlight': new AutoStyleExtension({
+                    config: {
+                        sectionA: {
+                            matchcase: false,
+                            wordsonly: false,
+                            class: 'combine-class-one',
+                            style: 'color:red;',
+                            words: ['CömbineStyleAndClass']
+                        },
+                        sectionB: {
+                            matchcase: false,
+                            wordsonly: true,
+                            style: 'background-color:#aaa;',
+                            words: ['mente']
+                        }
+                    }
+                })
             }
         });
+
+        var extension = editor.getExtensionByName('auto-highlight');
 
         editor.subscribe('editableInput', function (event, editable) {
 
@@ -54,32 +78,69 @@
         const lorca = new Lorca;
 
         editor.on($('.editable'), 'keyup', function(event){
-            if (timeoutId) clearTimeout(timeoutId);
 
+            setTimeout(function(){
+                $('#save-status').empty();
+            }, 500);
+
+            if (timeoutId) clearTimeout(timeoutId);
             timeoutId = setTimeout(function () {
-                console.log('saved');
-            }, 750);
+                $('#save-status').text('Guardado');
+            }, 1200);
 
             if(event.keyCode == 32){
                 //console.log("space");
             }
             let plainText = lorca.clean(editor.getContent()).statistics().analysis();
-            console.log(plainText);
+
+            if(plainText.content.sentences[plainText.content.sentences.length - 1].words.length > 3){
+                var str = plainText.content.sentences[plainText.content.sentences.length - 1].value.replace(/ nbsp./gi,'');
+
+                extension.setConfigSection('sectionRuun', {
+                    matchcase: false,
+                    wordsonly: true,
+                    //class: 'a-class',
+                    style: 'color:red;',
+                    words: [str]
+                });
+                extension.applyStyles();
+                //$('.editable').empty();
+//                editor.pasteHTML(newText);
+            }
+
             $('#level').text(plainText.infz.level);
             $('#words').text(plainText.content.words.length + ' palabras');
             $('#sentences').text(plainText.content.sentences.length + ' frases');
             $('#time').text(plainText.time);
-            $('#progress-value').css('width', plainText.infz.percentage);
 
-            //let statistics = silabas(plainText).statistics();
-            //let silabasArray = silabas(plainText).syllables();
+            function moveBar() {
+                var currentPercentage = Math.round(100*$('#progress-value').width()/$('.meter').width());
+                var target = plainText.infz.percentage;
 
+                clearInterval(window.id);
+                window.id = setInterval(frame, 50);
+                function frame() {
+                    if (target == currentPercentage) {
+                        clearInterval(window.id);
+                    } else if(target > currentPercentage) {
+                        currentPercentage++;
+                        $('#progress-value').css('width', currentPercentage + '%');
+                    } else {
+                        currentPercentage--;
+                        $('#progress-value').css('width', currentPercentage + '%');
+                    }
 
-//            console.log({
-//                "sentences": statistics.lines,
-//                "words": statistics.words,
-//                "syllabes": silabasArray.length,
-//            });
+                    if(currentPercentage < 25) {
+                        $('#progress-value').css('background-color', 'red');
+                    } else if (currentPercentage > 19 && currentPercentage < 38) {
+                        $('#progress-value').css('background-color', 'orange');
+                    } else {
+                        $('#progress-value').css('background-color', 'rgb(43,194,83)');
+                    }
+                }
+            }
+            moveBar();
+
         });
 
 //        document.getElementById('correct-button').addEventListener('click', function(){
@@ -91,48 +152,9 @@
 //                generateValueClass: true,
 //            });
 //
-//            //http://scielo.isciii.es/pdf/asisna/v31n2/original2.pdf
-//            //https://github.com/cgiffard/TextStatistics.js
-//            $('.editable').find('h2, h3, p, span').each(function(){$(this).append(" ")});
-//            let plainText = editor.getContent().replace(/<(?:.|\n)*?>/gm, '');
-//            let statistics = silabas(plainText).statistics();
-//            let silabasArray = silabas(plainText).syllables();
-//            let fernandez = 206.84 - 60*(silabasArray.length/words.length) - 1.02*(words.length/sentences.length);
-//            let infz = 206.835 - 62.3*(silabasArray.length/words.length) - words.length/sentences.length;
-//            let nivel = '';
-//            let grado = '';
-//
-//            if(infz > 0 && infz < 40){
-//                nivel = "Muy difícil";
-//                grado = "";
-//            } else if (infz > 40 && infz < 55){
-//                nivel ="Algo difícil";
-//                grado = "";
-//            } else if (infz > 55 && infz < 65){
-//                nivel ="Normal";
-//                grado = "";
-//            } else if (infz > 65 && infz < 80){
-//                nivel ="Bastante fácil";
-//                grado = "";
-//            } else if (infz > 80){
-//                nivel ="Muy fácil";
-//                grado = "";
-//            }
-//
-//            console.log({
-//                "sentences": sentences.length,
-//                "words": words.length,
-//                "syllables": silabasArray.length,
-//                "Fernandez Huerta": fernandez,
-//                "nivel": nivel,
-//                "INFZ": infz
-//            });
-//
 //            $(".editable").blast(false);
-//
-//            console.log(lorca.clean(editor.getContent()));
-//
 //        });
+
     </script>
 </body>
 </html>
