@@ -1,6 +1,11 @@
+//http://scielo.isciii.es/pdf/asisna/v31n2/original2.pdf
+//https://github.com/cgiffard/TextStatistics.js
+//http://courseware.url.edu.gt/Facultades/Facultad%20de%20Humanidades/Primer%20Ciclo%202011/Estrategias%20de%20comunicacion%20linguistica/Objetos%20de%20Aprendizaje/LyR%20critico/Diferentes%20tipos%20de%20discurso/01%20Diferentes%20tipos%20de%20discurso/frmula_de_velocidad.html
+
 class Lorca {
     constructor() {
         this.content = {};
+        this.infz = {};
     }
 
     clean(text) {
@@ -38,6 +43,7 @@ class Lorca {
         let spaces = 0;
         let wordsArr = [];
         let linesArr = [];
+        let readSpeed = 220; //wpm
         let obj = {'text': this.content.text, 'sentences': {}, words: []};
 
         if (this.content.text.length > 0) {
@@ -63,17 +69,29 @@ class Lorca {
                 ? pre.length - chars
                 : pre.length - chars - lines;
         }
+
         this.content = obj;
+
+        this.time = Math.round(60*this.content.words.length/readSpeed) + ' segundos'; // seconds
+
+        if(60*this.content.words.length/readSpeed > 60)
+        {
+            this.time = Math.round(this.content.words.length/readSpeed) + ' minutos'; // seconds
+        }
+
         this.content.chars = chars;
         this.content.spaces = spaces;
         this.content.syllables = silabas(this.content.text).syllables();
+        this.content.sentences.length = Object.keys(this.content.sentences).length;
+
         return this;
     }
     
     analysis()
     {
-
-        let infz = 206.835 - 62.3*(this.content.syllables.length/this.content.words.length) - this.content.words.length/Object.keys(this.content.sentences).length;
+        let syllablesPerWord = this.content.syllables.length/this.content.words.length;
+        let wordsPerSentence = this.content.words.length/this.content.sentences.length;
+        let infz = Math.abs(206.835 - 62.3*syllablesPerWord - wordsPerSentence);
         let level = '';
         let grado = '';
 
@@ -93,9 +111,9 @@ class Lorca {
             level ="Muy fácil";
             grado = "";
         }
-
-        this.infz = infz;
-        this.level = level;
+        this.infz.value = Math.round(infz);
+        this.infz.level = level;
+        this.infz.percentage = 100*this.infz.value/146 + "%";
 
         return this;
     }
