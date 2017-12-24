@@ -54,15 +54,21 @@
                         sectionA: {
                             matchcase: false,
                             wordsonly: false,
-                            class: 'combine-class-one',
-                            style: 'color:red;',
-                            words: ['CömbineStyleAndClass']
+//                            class: 'combine-class-one',
+                            style: 'background-color:rgba(255, 61, 0, 0.24);',
+                            words: ['[a-zA-Z0-9]{14,}']
                         },
                         sectionB: {
                             matchcase: false,
-                            wordsonly: true,
-                            style: 'background-color:#aaa;',
-                            words: ['mente']
+                            wordsonly: false,
+                            style: 'background-color:rgba(255, 61, 0, 0.24);',
+                            words: ['[a-z]+mente']
+                        },
+                        sectionB: {
+                            matchcase: false,
+                            wordsonly: false,
+                            style: 'background-color:rgba(255, 61, 0, 0.24);',
+                            words: ['[a-z A-z0-9áéíó?¿]{50,}']
                         }
                     }
                 })
@@ -92,21 +98,23 @@
                 //console.log("space");
             }
             let plainText = lorca.clean(editor.getContent()).statistics().analysis();
-
-            if(plainText.content.sentences[plainText.content.sentences.length - 1].words.length > 3){
-                var str = plainText.content.sentences[plainText.content.sentences.length - 1].value.replace(/ nbsp./gi,'');
-
-                extension.setConfigSection('sectionRuun', {
-                    matchcase: false,
-                    wordsonly: true,
-                    //class: 'a-class',
-                    style: 'color:red;',
-                    words: [str]
-                });
-                extension.applyStyles();
-                //$('.editable').empty();
-//                editor.pasteHTML(newText);
-            }
+//            let lastWords = plainText.content.sentences[plainText.content.sentences.length - 1].words;
+//
+//            if(lastWords.length > 2){
+//                var str = plainText.content.sentences[plainText.content.sentences.length - 1].value.replace(/\.|nbsp/gi,'').replace(/\s+/gi,' ');
+//                console.log(str);
+//                extension.setConfigSection('run-' + str, {
+//                    matchcase: false,
+//                    wordsonly: false,
+//                    //class: 'a-class',
+//                    style: 'background-color:red;',
+//                    words: [str]
+//                });
+//
+//                extension.applyStyles();
+//                //$('.editable').empty();
+////                editor.pasteHTML(newText);
+//            }
 
             $('#level').text(plainText.infz.level);
             $('#words').text(plainText.content.words.length + ' palabras');
