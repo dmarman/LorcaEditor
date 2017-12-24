@@ -44,6 +44,7 @@ class Lorca {
         let wordsArr = [];
         let linesArr = [];
         let readSpeed = 220; //wpm
+        let adverbs = [];
         let obj = {'text': this.content.text, 'sentences': {}, words: []};
 
         if (this.content.text.length > 0) {
@@ -63,6 +64,10 @@ class Lorca {
                     char = wordsArr[k].length;
                     chars += char;
                     if (char > 1) words += 1;
+                    
+                    if(/[a-zA-z0-9áéíóúàèìòùñç]+mente\b/.test(wordsArr[k])){
+                        adverbs.push(wordsArr[k]);
+                    }
                 }
             }
             spaces = lines === 1
@@ -78,12 +83,12 @@ class Lorca {
         {
             this.time = Math.round(this.content.words.length/readSpeed) + ' minutos'; // seconds
         }
-
+        this.content.adverbs = adverbs;
         this.content.chars = chars;
         this.content.spaces = spaces;
         this.content.syllables = silabas(this.content.text).syllables();
         this.content.sentences.length = Object.keys(this.content.sentences).length;
-
+        console.log(this.content);
         return this;
     }
     

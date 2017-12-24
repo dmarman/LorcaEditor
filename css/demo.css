@@ -194,6 +194,24 @@ blockquote {
     padding: 15px;
 }
 
-.blast {
-    background-color: #c1a425;
+.long-word {
+    /*background-color: #fff1cb;*/
+    text-decoration: none;
+    border-bottom: 2px solid #ff6262;
+}
+
+.long-sentence {
+    /*background-color: #fff1cb;*/
+    text-decoration: none;
+    border-bottom: 2px solid #ffba00;
+}
+
+.very-long-sentence {
+    text-decoration: none;
+    border-bottom: 2px solid #ff6262;
+}
+
+.adverb {
+    text-decoration: none;
+    border-bottom: 2px solid #72be72;
 }

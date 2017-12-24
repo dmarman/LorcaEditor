@@ -33,6 +33,7 @@
             <div id="words">0 palabras</div>
             <div id="sentences">0 frases</div>
             <div id="time">0 segundos</div>
+            <div id="adverbs"></div>
         </div>
     </div>
 
@@ -51,24 +52,29 @@
             extensions: {
                 'auto-highlight': new AutoStyleExtension({
                     config: {
-                        sectionA: {
+                        longWord: {
                             matchcase: false,
                             wordsonly: false,
-//                            class: 'combine-class-one',
-                            style: 'background-color:rgba(255, 61, 0, 0.24);',
+                            class: 'long-word',
                             words: ['[a-zA-Z0-9]{14,}']
                         },
-                        sectionB: {
+                        adverb: {
                             matchcase: false,
                             wordsonly: false,
-                            style: 'background-color:rgba(255, 61, 0, 0.24);',
-                            words: ['[a-z]+mente']
+                            class: 'adverb',
+                            words: ['[a-zA-z0-9áéíóúàèìòùñç]+mente\\b']
                         },
-                        sectionB: {
+                        veryLongSentence: {
                             matchcase: false,
                             wordsonly: false,
-                            style: 'background-color:rgba(255, 61, 0, 0.24);',
-                            words: ['[a-z A-z0-9áéíó?¿]{50,}']
+                            class: 'very-long-sentence',
+                            words: ['[a-z A-z0-9áéíóúàèìòùñç?¿\',-]{350,}']
+                        },
+                        longSentence: {
+                            matchcase: false,
+                            wordsonly: false,
+                            class: 'long-sentence',
+                            words: ['[a-z A-z0-9áéíóúàèìòùñç?¿\',-]{190,}']
                         }
                     }
                 })
@@ -120,6 +126,7 @@
             $('#words').text(plainText.content.words.length + ' palabras');
             $('#sentences').text(plainText.content.sentences.length + ' frases');
             $('#time').text(plainText.time);
+            $('#adverbs').text(plainText.content.adverbs.length + ' adverbios');
 
             function moveBar() {
                 var currentPercentage = Math.round(100*$('#progress-value').width()/$('.meter').width());
