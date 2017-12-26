@@ -10,25 +10,29 @@ var editor = new MediumEditor('.editable', {
                     matchcase: false,
                     wordsonly: false,
                     class: 'long-word',
-                    words: ['[a-zA-Z0-9]{14,}']
+                    words: ['[a-zA-Záéíóúàèìòùñç]{14,}']
                 },
                 adverb: {
                     matchcase: false,
                     wordsonly: false,
                     class: 'adverb',
-                    words: ['[a-zA-z0-9áéíóúàèìòùñç]+mente\\b']
+                    words: ['[a-zA-Z0-9áéíóúàèìòùñç]+mente\\b']
                 },
                 veryLongSentence: {
                     matchcase: false,
                     wordsonly: false,
                     class: 'very-long-sentence',
-                    words: ['[a-z A-z0-9áéíóúàèìòùñç?¿\',-]{350,}']
+                    words: ['[a-z A-Z0-9áéíóúàèìòùñç&()?¿\',-]{350,}']
+                    // words: ['([a-z A-Z0-9áéíóúàèìòùñç]+ ){40,}']
                 },
                 longSentence: {
                     matchcase: false,
                     wordsonly: false,
                     class: 'long-sentence',
-                    words: ['[a-z A-z0-9áéíóúàèìòùñç?¿\',-]{190,}']
+                    words: ['[a-z A-Z0-9áéíóúàèìòùñç&()?¿\',-]{190,}']
+                    // words: ['[a-z A-z0-9áéíóúàèìòùñç?¿\',-]{4,}']
+                    // words: ['([a-zA-zá]+\s){3,}[a-zA-zá]+[.?!]'] // no funciona
+                    // words: ['([a-z A-Z0-9áéíóúàèìòùñç]+ ){30,}'] //bloquea navegador
                 }
             }
         })
@@ -63,7 +67,13 @@ editor.on($('.editable'), 'keyup', function(event){
     $('#words').text(plainText.content.words.length + ' palabras');
     $('#sentences').text(plainText.content.sentences.length + ' frases');
     $('#time').text(plainText.time);
-    $('#adverbs').text(plainText.content.adverbs.length + ' adverbios');
+
+    if(plainText.content.adverbs.length > 0) {
+        $('#adverbs').text(plainText.content.adverbs.length + ' adverbios');
+    } else {
+        $('#adverbs').text('');
+    }
+
 
     function moveBar() {
         var currentPercentage = Math.round(100*$('#progress-value').width()/$('.meter').width());

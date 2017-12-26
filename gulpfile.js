@@ -6,10 +6,10 @@ var babel = require("gulp-babel");
 
 gulp.task('default', function() {
     return gulp.src([
-            './js/medium-editor.min.js',
-            './js/jquery.min.js',
+            // './js/medium-editor.min.js',
+            // './js/jquery.min.js',
             //'./js/lorca.js',
-            './js/auto-style.js',
+            // './js/auto-style.js',
             './js/app.js'
         ])
         .pipe(concat('all.js'))

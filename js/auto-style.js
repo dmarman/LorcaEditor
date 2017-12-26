@@ -4659,10 +4659,9 @@
                     var pos = 0;
 
                     while ((match = XRegExp.exec(textContent, regex, pos)) !== null) {
-
                         pos = match.index + 1;
 
-                        if (match.length === 2) {
+                        if (match.length === 2 || match.length === 3) {
                             // wordsonly: false
                             // HACK!
                             if (match[0] === "")
@@ -4704,7 +4703,6 @@
                     }
                 }
             }
-
             return matches;
         },
 

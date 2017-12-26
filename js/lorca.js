@@ -65,7 +65,7 @@ class Lorca {
                     chars += char;
                     if (char > 1) words += 1;
                     
-                    if(/[a-zA-z0-9áéíóúàèìòùñç]+mente\b/.test(wordsArr[k])){
+                    if(/[a-zA-Z0-9áéíóúàèìòùñç]+mente\b/.test(wordsArr[k])){
                         adverbs.push(wordsArr[k]);
                     }
                 }
@@ -79,16 +79,16 @@ class Lorca {
 
         this.time = Math.round(60*this.content.words.length/readSpeed) + ' segundos'; // seconds
 
-        if(60*this.content.words.length/readSpeed > 60)
-        {
+        if(60*this.content.words.length/readSpeed > 60) {
             this.time = Math.round(this.content.words.length/readSpeed) + ' minutos'; // seconds
         }
+        
         this.content.adverbs = adverbs;
         this.content.chars = chars;
         this.content.spaces = spaces;
         this.content.syllables = silabas(this.content.text).syllables();
         this.content.sentences.length = Object.keys(this.content.sentences).length;
-        console.log(this.content);
+        // console.log(this.content);
         return this;
     }
     
@@ -125,7 +125,6 @@ class Lorca {
 
 
 }
-
 
 
 function silabas(word) {
