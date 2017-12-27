@@ -4659,8 +4659,8 @@
                     var pos = 0;
 
                     while ((match = XRegExp.exec(textContent, regex, pos)) !== null) {
+                        // console.log(match);
                         pos = match.index + 1;
-
                         if (match.length === 2 || match.length === 3) {
                             // wordsonly: false
                             // HACK!
@@ -4677,13 +4677,15 @@
                                     end: matchEnd
                                 });
                             }
-                        } else if (match.length === 4) {
+                        } else if (match.length === 4 || match.length === 5) {
                             // wordsonly: true
                             // HACK!
                             if (match[2] === "")
                                 continue;
-                            var start = match.index + match[1].length;
-                            var matchEnd = start + match[2].length;
+                            var start = match.index;// + match[1].length;
+                            // console.log(match.index, match[1].length);
+                            // var matchEnd = start + match[2].length;
+                            var matchEnd = match.index + match[1].length;
                             var hash = start + '-' + matchEnd;
                             if (this.checkHash(hash)) {
                                 matches.push({
@@ -4703,6 +4705,8 @@
                     }
                 }
             }
+            // console.log(matches);
+
             return matches;
         },
 

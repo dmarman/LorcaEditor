@@ -6,6 +6,23 @@ var editor = new MediumEditor('.editable', {
     extensions: {
         'auto-highlight': new AutoStyleExtension({
             config: {
+                passive: {
+                    matchcase: false,
+                    wordsonly: false,
+                    class: 'passive',
+                    words: ['\\b(es|son|está|están|eran|era|estaba|estaban|fue|fueron|estuvo|estuvieron|ha sido|han sido|ha estado|han estado|había sido|habían sido|había estado|habían estado|será|serán|estará|estarán|habrá sido|habrán sido|habrá estado|habrán estado|sería|serían|estaría|estarían|habría sido|habrían sido|habría estado|habrían estado) ([a-z]+ |)[a-z]+(ado|ados|ido|idos)\\b']
+                    // words: [
+                    //     'es [a-z]+(ado|ados|ido|idos)\\b'
+                    // ]
+                },
+                // passive2: {
+                //     matchcase: false,
+                //     wordsonly: false,
+                //     class: 'passive',
+                //     words: [
+                //         'esta [a-z]+(ado|ados|ido|idos)\\b'
+                //     ]
+                // },
                 longWord: {
                     matchcase: false,
                     wordsonly: false,
@@ -61,18 +78,24 @@ editor.on($('.editable'), 'keyup', function(event){
     if(event.keyCode == 32){
         //console.log("space");
     }
-    let plainText = lorca.clean(editor.getContent()).statistics().analysis();
-
-    $('#level').text(plainText.infz.level);
-    $('#words').text(plainText.content.words.length + ' palabras');
-    $('#sentences').text(plainText.content.sentences.length + ' frases');
-    $('#time').text(plainText.time);
-
-    if(plainText.content.adverbs.length > 0) {
-        $('#adverbs').text(plainText.content.adverbs.length + ' adverbios');
-    } else {
-        $('#adverbs').text('');
-    }
+    let plainText = lorca.clean(editor.getContent()).statistics();//.analysis();
+console.log(plainText.content);
+    // $('#level').text(plainText.infz.level);
+    // $('#words').html('<strong>' + plainText.content.words.length + '</strong>' + ' palabras');
+    // $('#sentences').html('<strong>' + plainText.content.sentences.length + '</strong>' + ' frases');
+    // $('#time').text(plainText.time);
+    //
+    // if(plainText.content.adverbs.length > 0) {
+    //     $('#adverbs').html('<strong>' + plainText.content.adverbs.length + '</strong>' + ' adverbios');
+    // } else {
+    //     $('#adverbs').html('');
+    // }
+    //
+    // if(plainText.content.passiveSentences > 0){
+    //     $('#passive-sentences').html('<strong>' + plainText.content.passiveSentences + '</strong>' + ' frases pasivas');
+    // } else {
+    //     $('#passive-sentences').html('');
+    // }
 
 
     function moveBar() {

@@ -4,7 +4,11 @@
 
 class Lorca {
     constructor() {
-        this.content = {};
+        this.content = {
+            sentences: [],
+            words: [],
+            passiveSentences: 0
+        };
         this.infz = {};
     }
 
@@ -17,16 +21,17 @@ class Lorca {
         });
 
         text = text
-            .replace(/<[^>]+>/g, "")				// Strip tags
-            .replace(/[,:;()\/&+]|\-\-/g, " ")				// Replace commas, hyphens etc (count them as spaces)
+            .replace(/<[^>]+>/g, "")				    // Strip tags
+            .replace(/[,:;()\/&+]|\-\-/g, " ")          // Replace commas, hyphens etc (count them as spaces)
             .replace(/[\.!?]/g, ".")					// Unify terminators
             .replace(/^\s+/, "")						// Strip leading whitespace
             .replace(/[\.]?(\w+)[\.]?(\w+)@(\w+)[\.](\w+)[\.]?/g, "$1$2@$3$4")	// strip periods in email addresses (so they remain counted as one word)
-            .replace(/[ ]*(\n|\r\n|\r)[ ]*/g, ".")	// Replace new lines with periods
-            .replace(/([\.])[\.]+/g, ".")			// Check for duplicated terminators
+            .replace(/[ ]*(\n|\r\n|\r)[ ]*/g, ".")	    // Replace new lines with periods
+            .replace(/([\.])[\.]+/g, ".")			    // Check for duplicated terminators
             .replace(/[ ]*([\.])/g, ". ")				// Pad sentence terminators
             .replace(/\s+/g, " ")						// Remove multiple spaces
-            .replace(/\s+$/, "");					// Strip trailing whitespace
+            .replace(/\s+$/, "")					    // Strip trailing whitespace
+            .replace(/ nbsp/, "");
 
         if (text.slice(-1) != '.') {
             text += "."; // Add final terminator, just in case it's missing.
@@ -37,58 +42,67 @@ class Lorca {
 
     statistics()
     {
-        let lines = 0;
-        let words = 0;
         let chars = 0;
-        let spaces = 0;
-        let wordsArr = [];
-        let linesArr = [];
+        let wordsArray = [];
+        let sentencesArray = [];
         let readSpeed = 220; //wpm
-        let adverbs = [];
-        let obj = {'text': this.content.text, 'sentences': {}, words: []};
+        this.content.words = []; // Need to reset, do no remove
+        this.content.passiveSentences = 0; // Need to reset, do not remove
+        this.content.chars = 0;
+        this.content.adverbs = [];
+        this.content.spaces = 0;
 
         if (this.content.text.length > 0) {
-            let pre = this.content.text;
-            if (/\r\n/.test(this.text)) pre = this.text.replace(/\r\n/g, '\n'); // exclude double char from bieng count
-            let init = pre;
-            if (/\n /.test(this.text)) init = pre.replace(/\n /g, '\n'); // exclude newline with a start spacing
-            linesArr = init.trim().match( /[^\.!\?]+[\.!\?]+/g );
-            lines = linesArr.length;
-            let char;
-            for (let i = 0; i < lines; i += 1) {
-                wordsArr = linesArr[i].trim().split(/\s+/);
-                obj.sentences[i] = {value: linesArr[i], words: []};
-                obj.sentences[i].words = wordsArr;
-                obj.words = obj.words.concat(wordsArr);
-                for (let k = 0; k < wordsArr.length; k += 1) {
-                    char = wordsArr[k].length;
-                    chars += char;
-                    if (char > 1) words += 1;
-                    
-                    if(/[a-zA-Z0-9áéíóúàèìòùñç]+mente\b/.test(wordsArr[k])){
-                        adverbs.push(wordsArr[k]);
+            // let pre = this.content.text;
+            //
+            // if (/\r\n/.test(this.text)) {
+            //     pre = this.text.replace(/\r\n/g, '\n'); // exclude double char from being count
+            // }
+            //
+            // let init = pre;
+            //
+            // if (/\n /.test(this.text)) {
+            //     init = pre.replace(/\n /g, '\n'); // exclude newline with a start spacing
+            // }
+
+            sentencesArray = this.content.text.trim().match( /[^\.!\?]+[\.!\?]+/g );
+
+            for (let i = 0; i < sentencesArray.length; i++) {
+
+                wordsArray = sentencesArray[i].trim().split(/\s+/);
+
+                this.content.sentences[i] = {value: sentencesArray[i], words: wordsArray, isPassive: false, adverbs: []};
+
+                this.content.words = this.content.words.concat(wordsArray);
+
+                if(/\b(es|son|está|están|eran|era|estaba|estaban|fue|fueron|estuvo|estuvieron|ha sido|han sido|ha estado|han estado|había sido|habían sido|había estado|habían estado|será|serán|estará|estarán|habrá sido|habrán sido|habrá estado|habrán estado|sería|serían|estaría|estarían|habría sido|habrían sido|habría estado|habrían estado) ([a-z]+ |)[a-z]+(ado|ados|ido|idos)\b/.test(sentencesArray[i])) {
+                    this.content.sentences[i].isPassive = true;
+                    this.content.passiveSentences++;
+                }
+
+                for (let k = 0; k < wordsArray.length; k += 1) {
+                    this.content.chars += wordsArray[k].length;
+
+                    if(/[a-zA-Z0-9áéíóúàèìòùñç]+mente\b/.test(wordsArray[k])){
+                        this.content.adverbs.push(wordsArray[k]);
+                        this.content.sentences[i].adverbs.push(wordsArray[k]);
                     }
                 }
             }
-            spaces = lines === 1
-                ? pre.length - chars
-                : pre.length - chars - lines;
+            this.content.spaces = sentencesArray.length === 1
+                ? this.content.text.length - this.content.chars
+                : this.content.text.length - this.content.chars - sentencesArray.length;
         }
-
-        this.content = obj;
 
         this.time = Math.round(60*this.content.words.length/readSpeed) + ' segundos'; // seconds
 
         if(60*this.content.words.length/readSpeed > 60) {
-            this.time = Math.round(this.content.words.length/readSpeed) + ' minutos'; // seconds
+           this.time = Math.round(this.content.words.length/readSpeed) + ' minutos'; // seconds
         }
-        
-        this.content.adverbs = adverbs;
-        this.content.chars = chars;
-        this.content.spaces = spaces;
+
         this.content.syllables = silabas(this.content.text).syllables();
         this.content.sentences.length = Object.keys(this.content.sentences).length;
-        // console.log(this.content);
+
         return this;
     }
     
@@ -478,7 +492,7 @@ function silabas(word) {
     }
 
     function isConsonant(pos) {
-        var c = word[pos]
+        var c = word[pos];
         switch (c) {
             // Open-vowel or close-vowel with written accent
             case 'a': case 'á': case 'A': case 'Á': case 'à': case 'À':
@@ -499,7 +513,7 @@ function silabas(word) {
 
     this.positions = function () {
         return positions;
-    }
+    };
 
     this.syllables = function () {
         var syllables = [];
@@ -513,7 +527,7 @@ function silabas(word) {
             syllables.push(seq);
         }
         return syllables;
-    }
+    };
 
     return this;
 }    
