@@ -11,18 +11,7 @@ var editor = new MediumEditor('.editable', {
                     wordsonly: false,
                     class: 'passive',
                     words: ['\\b(es|son|está|están|eran|era|estaba|estaban|fue|fueron|estuvo|estuvieron|ha sido|han sido|ha estado|han estado|había sido|habían sido|había estado|habían estado|será|serán|estará|estarán|habrá sido|habrán sido|habrá estado|habrán estado|sería|serían|estaría|estarían|habría sido|habrían sido|habría estado|habrían estado) ([a-z]+ |)[a-z]+(ado|ados|ido|idos)\\b']
-                    // words: [
-                    //     'es [a-z]+(ado|ados|ido|idos)\\b'
-                    // ]
                 },
-                // passive2: {
-                //     matchcase: false,
-                //     wordsonly: false,
-                //     class: 'passive',
-                //     words: [
-                //         'esta [a-z]+(ado|ados|ido|idos)\\b'
-                //     ]
-                // },
                 longWord: {
                     matchcase: false,
                     wordsonly: false,
@@ -47,9 +36,6 @@ var editor = new MediumEditor('.editable', {
                     wordsonly: false,
                     class: 'long-sentence',
                     words: ['[a-z A-Z0-9áéíóúàèìòùñç&()?¿\',-]{190,}']
-                    // words: ['[a-z A-z0-9áéíóúàèìòùñç?¿\',-]{4,}']
-                    // words: ['([a-zA-zá]+\s){3,}[a-zA-zá]+[.?!]'] // no funciona
-                    // words: ['([a-z A-Z0-9áéíóúàèìòùñç]+ ){30,}'] //bloquea navegador
                 }
             }
         })
@@ -58,11 +44,34 @@ var editor = new MediumEditor('.editable', {
 
 var extension = editor.getExtensionByName('auto-highlight');
 
-editor.subscribe('editableInput', function (event, editable) {
-
-});
-
 var lorca = new Lorca;
+
+$('#analysis-button').click(function () {
+    let text = lorca.clean(editor.getContent()).content.text;
+    console.log(text.length);
+    $.post(
+        'https://apiv2.indico.io/apis/multiapi?apis=sentiment,emotion,political',
+        JSON.stringify({
+            'api_key': "da31014df45323a1f053c796be834921",
+            'language': 'spanish',
+            'data': text
+        })
+    ).then(function(res) {
+        let obj = JSON.parse(res);
+
+        $('#anger').text(Math.round(100*obj.results.emotion.results.anger) + '%');
+        $('#fear').text(Math.round(100*obj.results.emotion.results.fear) + '%');
+        $('#joy').text(Math.round(100*obj.results.emotion.results.joy) + '%');
+        $('#sadness').text(Math.round(100*obj.results.emotion.results.sadness) + '%');
+        $('#surprise').text(Math.round(100*obj.results.emotion.results.surprise) + '%');
+        $('#conservative').text(Math.round(100*obj.results.political.results.Conservative) + '%');
+        $('#green').text(Math.round(100*obj.results.political.results.Green) + '%');
+        $('#liberal').text(Math.round(100*obj.results.political.results.Liberal) + '%');
+        $('#libertarian').text(Math.round(100*obj.results.political.results.Libertarian) + '%');
+        $('#sentiment').text(Math.round(100*obj.results.sentiment.results) + '%');
+
+    });
+});
 
 editor.on($('.editable'), 'keyup', function(event){
 
@@ -78,24 +87,22 @@ editor.on($('.editable'), 'keyup', function(event){
     if(event.keyCode == 32){
         //console.log("space");
     }
-    let plainText = lorca.clean(editor.getContent()).statistics();//.analysis();
-console.log(plainText.content);
-    // $('#level').text(plainText.infz.level);
-    // $('#words').html('<strong>' + plainText.content.words.length + '</strong>' + ' palabras');
-    // $('#sentences').html('<strong>' + plainText.content.sentences.length + '</strong>' + ' frases');
-    // $('#time').text(plainText.time);
-    //
-    // if(plainText.content.adverbs.length > 0) {
-    //     $('#adverbs').html('<strong>' + plainText.content.adverbs.length + '</strong>' + ' adverbios');
-    // } else {
-    //     $('#adverbs').html('');
-    // }
-    //
-    // if(plainText.content.passiveSentences > 0){
-    //     $('#passive-sentences').html('<strong>' + plainText.content.passiveSentences + '</strong>' + ' frases pasivas');
-    // } else {
-    //     $('#passive-sentences').html('');
-    // }
+    
+    let plainText = lorca.clean(editor.getContent()).statistics();
+    // console.log(plainText);
+    $('#level').text(plainText.infz.level);
+    $('#words').html(plainText.content.words.length);
+    $('#sentences').html(plainText.content.sentences.length);
+    $('#time').text(plainText.time.value);
+    $('#units').text(plainText.time.units);
+
+    plainText.content.adverbs.length > 0
+    ? $('#adverbs').html(plainText.content.adverbs.length)
+    : $('#adverbs').html(0);
+    
+    plainText.content.passiveSentences > 0
+    ? $('#passive-sentences').html(plainText.content.passiveSentences)
+    : $('#passive-sentences').html(0);
 
 
     function moveBar() {

@@ -4,11 +4,7 @@
 
 class Lorca {
     constructor() {
-        this.content = {
-            sentences: [],
-            words: [],
-            passiveSentences: 0
-        };
+        this.content = {};
         this.infz = {};
     }
 
@@ -42,28 +38,17 @@ class Lorca {
 
     statistics()
     {
-        let chars = 0;
         let wordsArray = [];
         let sentencesArray = [];
         let readSpeed = 220; //wpm
         this.content.words = []; // Need to reset, do no remove
+        this.content.sentences = [];
         this.content.passiveSentences = 0; // Need to reset, do not remove
         this.content.chars = 0;
         this.content.adverbs = [];
         this.content.spaces = 0;
 
         if (this.content.text.length > 0) {
-            // let pre = this.content.text;
-            //
-            // if (/\r\n/.test(this.text)) {
-            //     pre = this.text.replace(/\r\n/g, '\n'); // exclude double char from being count
-            // }
-            //
-            // let init = pre;
-            //
-            // if (/\n /.test(this.text)) {
-            //     init = pre.replace(/\n /g, '\n'); // exclude newline with a start spacing
-            // }
 
             sentencesArray = this.content.text.trim().match( /[^\.!\?]+[\.!\?]+/g );
 
@@ -71,7 +56,12 @@ class Lorca {
 
                 wordsArray = sentencesArray[i].trim().split(/\s+/);
 
-                this.content.sentences[i] = {value: sentencesArray[i], words: wordsArray, isPassive: false, adverbs: []};
+                this.content.sentences[i] = {
+                    value: sentencesArray[i],
+                    words: wordsArray,
+                    isPassive: false,
+                    adverbs: []
+                };
 
                 this.content.words = this.content.words.concat(wordsArray);
 
@@ -94,44 +84,34 @@ class Lorca {
                 : this.content.text.length - this.content.chars - sentencesArray.length;
         }
 
-        this.time = Math.round(60*this.content.words.length/readSpeed) + ' segundos'; // seconds
-
-        if(60*this.content.words.length/readSpeed > 60) {
-           this.time = Math.round(this.content.words.length/readSpeed) + ' minutos'; // seconds
-        }
+        60*this.content.words.length/readSpeed > 60 
+            ? this.time = {value: Math.round(this.content.words.length/readSpeed), units: 'minutos'}
+            : this.time = {value: Math.round(60*this.content.words.length/readSpeed), units: 'segundos'};
 
         this.content.syllables = silabas(this.content.text).syllables();
         this.content.sentences.length = Object.keys(this.content.sentences).length;
 
-        return this;
-    }
-    
-    analysis()
-    {
+        //infz
         let syllablesPerWord = this.content.syllables.length/this.content.words.length;
         let wordsPerSentence = this.content.words.length/this.content.sentences.length;
-        let infz = Math.abs(206.835 - 62.3*syllablesPerWord - wordsPerSentence);
-        let level = '';
-        let grado = '';
+        this.infz.value = Math.round(Math.abs(206.835 - 62.3*syllablesPerWord - wordsPerSentence));
 
-        if(infz > 0 && infz < 40){
-            level = "Muy difícil";
-            grado = "";
-        } else if (infz > 40 && infz < 55){
-            level ="Algo difícil";
-            grado = "";
-        } else if (infz > 55 && infz < 65){
-            level ="Normal";
-            grado = "";
-        } else if (infz > 65 && infz < 80){
-            level ="Bastante fácil";
-            grado = "";
-        } else if (infz > 80){
-            level ="Muy fácil";
-            grado = "";
+        if(this.infz.value > 0 && this.infz.value < 40){
+            this.infz.level = "Muy difícil";
+            this.infz.grade = "Universitario, Científico";
+        } else if (this.infz.value > 40 && this.infz.value < 55){
+            this.infz.level = "Algo difícil";
+            this.infz.grade = "Bachillerato, Divulgación científica, Prensa especializada";
+        } else if (this.infz.value > 55 && this.infz.value < 65){
+            this.infz.level = "Normal";
+            this.infz.grade = "E.S.O., Prensa general, Prensa deportiva";
+        } else if (this.infz.value > 65 && this.infz.value < 80){
+            this.infz.level = "Bastante fácil";
+            this.infz.grade = "Educación primaria, Prensa del corazón, Novelas de éxito";
+        } else if (this.infz.value > 80){
+            this.infz.level = "Muy fácil";
+            this.infz.grade = "Educación primaria, Tebeos, Cómic";
         }
-        this.infz.value = Math.round(infz);
-        this.infz.level = level;
         this.infz.percentage = Math.round(100*this.infz.value/146);
 
         return this;
@@ -140,7 +120,6 @@ class Lorca {
 
 }
 
-
 function silabas(word) {
     var stressedFound = false;
     var stressed = 0;
@@ -148,34 +127,6 @@ function silabas(word) {
 
     var wordLength = word.length;
     var positions = [];
-
-    this.statistics = function () {
-        let lines = 0;
-        let words = 0;
-        let chars = 0;
-        let spaces = 0;
-        if (word.length > 0) {
-            let pre = word;
-            if (/\r\n/.test(word)) pre = word.replace(/\r\n/g, '\n'); // exclude double char from bieng count
-            let init = pre;
-            if (/\n /.test(word)) init = pre.replace(/\n /g, '\n'); // exclude newline with a start spacing
-            const linesArr = init.trim().split(/\r|\n/);
-            lines = linesArr.length;
-            let char;
-            for (let i = 0; i < lines; i += 1) {
-                const wordsArr = linesArr[i].trim().split(/\s+/);
-                for (let k = 0; k < wordsArr.length; k += 1) {
-                    char = wordsArr[k].length;
-                    chars += char;
-                    if (char > 1) words += 1;
-                }
-            }
-            spaces = lines === 1
-                ? pre.length - chars
-                : pre.length - chars - lines;
-        }
-        return {lines, words, chars, spaces};
-    };
 
     function process () {
         var numSyl = 0;
@@ -195,7 +146,6 @@ function silabas(word) {
 
         // If the word has not written accent, the stressed syllable is determined
         // according to the stress rules
-
         if (!stressedFound) {
             if (numSyl < 2) stressed = numSyl;  // Monosyllables
             else {                              // Polysyllables
@@ -281,7 +231,6 @@ function silabas(word) {
         }
 
         // If 'h' has been inserted in the nucleus then it doesn't determine diphthong neither hiatus
-
         var aitch = false;
         if (pos < wordLength) {
             if (toLower(pos) == 'h') {
@@ -291,7 +240,6 @@ function silabas(word) {
         }
 
         // Second vowel
-
         if (pos < wordLength) {
             switch (toLower(pos)) {
                 // Open-vowel with written accent
@@ -345,7 +293,6 @@ function silabas(word) {
         }
 
         // Third vowel?
-
         if (pos < wordLength) {
             if ((toLower(pos) == 'i') || (toLower(pos) == 'u')) { // Close-vowel
                 pos++;
@@ -372,7 +319,6 @@ function silabas(word) {
         var c2 = toLower(pos + 1);
 
         // Has the syllable a third consecutive consonant?
-
         if (pos < wordLength - 2) {
             var c3 = toLower(pos + 2);
 
@@ -389,46 +335,38 @@ function silabas(word) {
                     return pos;
 
                 // If the letter 'y' is preceded by the some
-                //      letter 's', 'l', 'r', 'n' or 'c' then
-                //      a new syllable begins in the previous consonant
+                // letter 's', 'l', 'r', 'n' or 'c' then
+                // a new syllable begins in the previous consonant
                 // else it begins in the letter 'y'
-
                 if ((c2 == 'y')) {
-                    if ((c1 == 's') || (c1 == 'l') || (c1 == 'r') || (c1 == 'n') || (c1 == 'c'))
+                    if ((c1 == 's') || (c1 == 'l') || (c1 == 'r') || (c1 == 'n') || (c1 == 'c')) {
                         return pos;
-
+                    }
                     pos++;
+
                     return pos;
                 }
 
                 // groups: gl - kl - bl - vl - pl - fl - tl
-
-                if ((((c1 == 'b')||(c1 == 'v')||(c1 == 'c')||(c1 == 'k')||
-                        (c1 == 'f')||(c1 == 'g')||(c1 == 'p')||(c1 == 't')) &&
-                        (c2 == 'l')
-                    )
-                ) {
+                if ((((c1 == 'b')||(c1 == 'v')||(c1 == 'c')||(c1 == 'k')||(c1 == 'f')||(c1 == 'g')||(c1 == 'p')||(c1 == 't'))&&(c2 == 'l'))) {
                     return pos;
                 }
 
                 // groups: gr - kr - dr - tr - br - vr - pr - fr
-
-                if ((((c1 == 'b')||(c1 == 'v')||(c1 == 'c')||(c1 == 'd')||(c1 == 'k')||
-                        (c1 == 'f')||(c1 == 'g')||(c1 == 'p')||(c1 == 't')) &&
-                        (c2 == 'r')
-                    )
-                ) {
+                if ((((c1 == 'b')||(c1 == 'v')||(c1 == 'c')||(c1 == 'd')||(c1 == 'k')||(c1 == 'f')||(c1 == 'g')||(c1 == 'p')||(c1 == 't'))&&(c2 == 'r'))) {
                     return pos;
                 }
 
                 pos++;
+
                 return pos;
-            }
-            else { // There is a third consonant
+
+            } else { // There is a third consonant
                 if ((pos + 3) == wordLength) { // Three consonants to the end, foreign words?
                     if ((c2 == 'y')) {  // 'y' as vowel
-                        if ((c1 == 's') || (c1 == 'l') || (c1 == 'r') || (c1 == 'n') || (c1 == 'c'))
+                        if ((c1 == 's') || (c1 == 'l') || (c1 == 'r') || (c1 == 'n') || (c1 == 'c')) {
                             return pos;
+                        }
                     }
 
                     if (c3 == 'y') { // 'y' at the end as vowel with c2
@@ -491,22 +429,9 @@ function silabas(word) {
         return word[pos].toLowerCase();
     }
 
-    function isConsonant(pos) {
-        var c = word[pos];
-        switch (c) {
-            // Open-vowel or close-vowel with written accent
-            case 'a': case 'á': case 'A': case 'Á': case 'à': case 'À':
-            case 'e': case 'é': case 'E': case 'É': case 'è': case 'È':
-            case 'í': case 'Í': case 'ì': case 'Ì':
-            case 'o': case 'ó': case 'O': case 'Ó': case 'ò': case 'Ò':
-            case 'ú': case 'Ú': case 'ù': case 'Ù':
-            // Close-vowel
-            case 'i': case 'I':
-            case 'u': case 'U':
-            case 'ü': case 'Ü':
-            return false;
-        }
-        return true;
+    function isConsonant(pos)
+    {
+        return !/[aeiouáéíóúàèìòùüAEIOUÁÉÍÓÚÀÈÌÒÙÜ]/.test(word[pos]);
     }
 
     process();
