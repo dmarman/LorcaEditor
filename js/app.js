@@ -98,10 +98,11 @@ editor.on($('.editable'), 'keyup', function(event){
     plainText.getSentenceHistogram();
     //console.log(plainText);
     $('#word-frequency').text('');
-
+    
     for(const word in list){
         $('#word-frequency').append(word + '</br>');
     }
+    
 
     $('#time').text(plainText.time.value);
     $('#units').text(plainText.time.units);
