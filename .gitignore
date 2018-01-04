@@ -1,6 +1,18 @@
 node_modules
 .idea
-regex.txt
+junk/regex.txt
 node_modules
 package-lock.json
-regex passive.txt
+junk/regex passive.txt
+junk/text.txt
+junk/wordLemPoS.txt
+junk/CREA_total.TXT
+junk/spanishwords.txt
+junk/index.js
+junk/frequencyListRAE.js
+junk/frequencyListRAE.json
+junk/frequencyListRAE20000.js
+junk/frequencyListRAE30000.js
+junk/frequencyListRAE40000.js
+junk/output.json
+js/AFINN.json

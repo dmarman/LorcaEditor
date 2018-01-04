@@ -28,14 +28,14 @@ var editor = new MediumEditor('.editable', {
                     matchcase: false,
                     wordsonly: false,
                     class: 'very-long-sentence',
-                    words: ['[a-z A-Z0-9áéíóúàèìòùñç&()?¿\',-]{350,}']
+                    words: ['[a-z A-Z0-9áéíóúàèìòùñç&()%?¿\',-]{350,}']
                     // words: ['([a-z A-Z0-9áéíóúàèìòùñç]+ ){40,}']
                 },
                 longSentence: {
                     matchcase: false,
                     wordsonly: false,
                     class: 'long-sentence',
-                    words: ['[a-z A-Z0-9áéíóúàèìòùñç&()?¿\',-]{190,}']
+                    words: ['[a-z A-Z0-9áéíóúàèìòùñç&()%?¿\',-]{190,}']
                 }
             }
         })
@@ -89,12 +89,33 @@ editor.on($('.editable'), 'keyup', function(event){
     }
     
     let plainText = lorca.clean(editor.getContent()).statistics();
-    // console.log(plainText);
+    var list = plainText.getAllFrequencies();
+    plainText.getOutlierWordFrequency();
+    plainText.getUniqueWordFrequency();
+    plainText.getAbsoluteWordFrequency();
+    plainText.getPronounsFrequency();
+    plainText.getSyllableHistogram();
+    plainText.getSentenceHistogram();
+    //console.log(plainText);
+    $('#word-frequency').text('');
+
+    for(const word in list){
+        $('#word-frequency').append(word + '</br>');
+    }
+
+    $('#time').text(plainText.time.value);
+    $('#units').text(plainText.time.units);
     $('#level').text(plainText.infz.level);
     $('#words').html(plainText.content.words.length);
     $('#sentences').html(plainText.content.sentences.length);
-    $('#time').text(plainText.time.value);
-    $('#units').text(plainText.time.units);
+
+    $('#infz').text(plainText.infz.value);
+    $('#outlier').text(Math.round(100*plainText.outlierWordFrecuency));
+    $('#unique').text(Math.round(100*plainText.uniqueWordFrecuency));
+    $('#absolute').text(Math.round(100*plainText.absoluteWordFrequency));
+    $('#words-per-sentence').text(plainText.wordsPerSentence.toPrecision(3));
+    $('#syllables-per-word').text(plainText.syllablesPerWord.toPrecision(3));
+    $('#pronouns').text(Math.round(100*plainText.pronouns.percentage.total));
 
     plainText.content.adverbs.length > 0
     ? $('#adverbs').html(plainText.content.adverbs.length)

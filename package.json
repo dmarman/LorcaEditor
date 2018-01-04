@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "medium-editor": "^5.23.3"
+    "csvtojson": "^1.1.9",
+    "medium-editor": "^5.23.3",
+    "node-tsv-json": "^0.2.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

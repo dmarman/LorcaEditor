@@ -6,6 +6,25 @@ class Lorca {
     constructor() {
         this.content = {};
         this.infz = {};
+        this.absoluteFrequencies = {};
+        this.relativeFrequencies = {};
+        this.idf = {};
+        this.outlierWords = [];
+        this.outlierWordFrecuency = null;
+        this.spectograms = {};
+        this.syllablesPerWord = 0;
+        this.wordsPerSentence = 0;
+        this.uniqueWords = [];
+        this.uniqueWordFrecuency = null;
+        this.pronouns = { 
+            personal: {
+                tonic: {},  
+                atonic: {} 
+            },
+            posesive: [],
+            percentage: {}
+        };
+        this.syllableHistogram = [];
     }
 
     clean(text) {
@@ -36,36 +55,340 @@ class Lorca {
         return this;
     }
 
+    getLastFrequencyListRAE()
+    {
+        return frequencyListRAE[Object.keys(frequencyListRAE)[Object.keys(frequencyListRAE).length - 1]];
+    }
+
+    absoluteWords()
+    {
+        if(Object.keys(this.absoluteFrequencies).length == 0){
+            this.calculateAbsoluteFrequencies();
+        }
+
+        return Object.keys(this.absoluteFrequencies);
+    }
+
+    getAbsoluteWordFrequency()
+    {
+        this.absoluteWordFrequency = this.absoluteWords().length/this.content.words.length;
+        
+        return this.absoluteWordFrequency;
+    }
+
+    getOutlierWords()
+    {
+        this.outlierWords = [];
+        
+        for(var token in this.content.words){
+            token = this.content.words[token].toLowerCase();
+            if(frequencyListRAE[token] == undefined){
+                this.outlierWords[token] = this.absoluteFrequencies[token];
+            } 
+        }
+        
+        return this.outlierWords;
+    }
+
+    getOutlierWordFrequency()
+    {
+        if(this.outlierWords.length === 0){
+            this.getOutlierWords();
+        }
+
+        this.outlierWordFrecuency = Object.keys(this.outlierWords).length/this.content.words.length;
+        
+        return this.outlierWordFrecuency;
+    }
+
+    getUniqueWords()
+    {
+        this.uniqueWords = [];
+
+        for(var token in this.absoluteFrequencies){
+            if(this.absoluteFrequencies[token] === 1){
+                this.uniqueWords.push(token);
+            }
+        }
+
+        return this.uniqueWords;
+    }
+
+    getUniqueWordFrequency()
+    {
+        if(this.uniqueWords.length === 0){
+            this.getUniqueWords();
+        }
+
+        this.uniqueWordFrecuency = this.uniqueWords.length/this.content.words.length;
+
+        return this.uniqueWordFrecuency;
+    }
+
+    getRelativeFrequencyCorpus(token)
+    {
+        if(frequencyListRAE[token] == undefined){
+            return 0.00000301;
+        } else if (frequencyListRAE[token] == 0.00){
+            return 0.01/1000000;
+        } else {
+            return frequencyListRAE[token];
+        }
+    }
+
+    calculateAbsoluteFrequencies() //TODO this method should accept and argument and be decoupled of this.
+    {
+        this.absoluteFrequencies = {}; 
+
+        for(let i = 0; i < this.content.words.length; i++){
+            var wordSample = this.content.words[i].toLowerCase();
+            if(this.absoluteFrequencies.hasOwnProperty(wordSample)){
+                this.absoluteFrequencies[wordSample] += 1;
+            } else {
+                this.absoluteFrequencies[wordSample] = 1;
+            }
+        }
+
+        return this.absoluteFrequencies;
+    }
+
+    calculateRelativeFrequencies()
+    {
+        this.relativeFrequencies = {};
+
+        this.absoluteFrequencies = this.calculateAbsoluteFrequencies();
+
+        for(var token in this.absoluteFrequencies){
+            this.relativeFrequencies[token] = this.absoluteFrequencies[token]/this.content.words.length; 
+        }
+
+        return this.relativeFrequencies;
+    }
+
+    calculateIDF()
+    {
+        this.idf = {};
+
+        this.relativeFrequencies = this.calculateRelativeFrequencies();
+
+        for (var token in this.relativeFrequencies) {
+            var relativeFrequencyCorpus = this.getRelativeFrequencyCorpus(token);
+            this.idf[token] = -this.relativeFrequencies[token]/0.0001*Math.log(relativeFrequencyCorpus/0.001);
+        }
+
+        return this.idf;
+    }
+
+    buildAllFrecuenciesObject()
+    {
+        var sortable = [];
+
+        var idf = this.calculateIDF();     
+
+        for (var token in idf) {
+            sortable.push([
+                token, 
+                this.absoluteFrequencies[token], 
+                this.getRelativeFrequencyCorpus(token), 
+                idf[token], 
+                this.relativeFrequencies[token]
+            ]);
+        }
+
+        this.spectograms = sortable;
+
+        return sortable;
+    }
+
+    sortBy(sortable, name, listMaxLength)
+    {
+        var sorted = {};
+
+        sortable.sort(function(a, b) {
+            return b[name] - a[name];
+        });
+
+        if(listMaxLength == undefined || listMaxLength > sortable.length){
+            listMaxLength = sortable.length;
+        }
+        
+        for(let i = 0; i < listMaxLength; i++){
+            sorted[sortable[i][0]] = {
+                absolute: sortable[i][1],
+                relative: sortable[i][4],
+                corpusRelative: sortable[i][2],
+                idf: sortable[i][3]
+            };
+        }
+
+        this.spectograms = sorted;
+
+        return sorted;
+    }
+
+    getAllFrequencies(listMaxLength)
+    {
+        var sortable = [];
+        var sorted = {};
+
+        sortable = this.buildAllFrecuenciesObject();
+
+        sorted = this.sortBy(sortable, 3, 10);
+
+        this.getUniqueWords();
+
+        return sorted;    
+    }
+
+    getSyllablesPerWord()
+    {
+        this.syllablesPerWord = this.content.syllables.length/this.content.words.length;
+
+        return this.syllablesPerWord;
+    }
+
+    getWordsPerSentence()
+    {
+        this.wordsPerSentence = this.content.words.length/this.content.sentences.length;
+    
+        return this.wordsPerSentence;
+    }
+
+    getPronouns()
+    {
+        //TODO palabra con acento como míote ará match con mío, el acento no furula bien
+        var tonicRegex = /\b(yo|tú|vos|usted|él|ella|ello|nosotros|nosotras|ustedes|ellos|ellas|mí|conmigo|ti|contigo|consigo)\b/gi;
+        var posesiveRegex = /\b(mío|mía|míos|mías|tuyo|tuya|tuyos|tuyas|suyo|suya|suyos|suyas|nuestro|nuestra|nuestros|nuestras|vuestro|vuestra|vuestros|vuestras|suyo|suya|suyos|suyas)\b/gi;
+        var demostrativeRegex = /\b(esta|este|esto|estos|estas|ese|esa|eso|esos|esas|aquel|aquella|aquello|aquellos|aquellas)\b/gi;
+        var indefiniteRegex = /\b(uno|una|unos|unas|alguno|alguna|algo|algunos|algunas|ninguno|ninguna|nada|ningunos|ningunas|poco|poca|pocos|pocas|escaso|escasa|escasos|escasas|mucho|mucha|muchos|muchas|demasiado|demasiada|demasiados|demasiadas|todo|toda|todos|todas|varios|varias|otro|otra|otros|otras|mismo|misma|mismos|mismas|tan|tanto|tanta|tantos|tantas|alguien|nadie|cualquiera|quienquiera|demás|cualesquiera|quienesquiera)\b/gi;
+
+        this.pronouns.personal.tonic = this.content.text.match(tonicRegex) || [];
+        this.pronouns.posesive = this.content.text.match(posesiveRegex) || [];
+        this.pronouns.demostrative = this.content.text.match(demostrativeRegex) || [];
+        this.pronouns.indefinite =   this.content.text.match(indefiniteRegex) || [];
+
+        return this.pronouns;   
+    }
+
+    getPronounsFrequency()
+    {
+        this.pronouns = this.getPronouns();
+
+        this.pronouns.percentage.personalTonic = this.pronouns.personal.tonic.length/this.content.words.length;
+        this.pronouns.percentage.posesive = this.pronouns.posesive.length/this.content.words.length;
+        this.pronouns.percentage.demostrative = this.pronouns.demostrative.length/this.content.words.length;
+        this.pronouns.percentage.indefinite = this.pronouns.indefinite.length/this.content.words.length;
+
+        this.pronouns.percentage.total = (this.pronouns.personal.tonic.length + this.pronouns.posesive.length + this.pronouns.demostrative.length + this.pronouns.indefinite.length)/this.content.words.length;
+
+        return this.pronouns.percentage;
+    }
+
+    INFZ()
+    {
+        var syllablesPerWord = this.getSyllablesPerWord();
+        var wordsPerSentence = this.getWordsPerSentence();
+        
+        return Math.round(Math.abs(206.835 - 62.3*syllablesPerWord - wordsPerSentence));
+    }
+
+    getSyllableHistogram()
+    {
+        var syllableHistogram = [];
+
+        for(var token in this.content.words){
+            var tokenSyllables = silabas(this.content.words[token]).syllables();
+
+            if(syllableHistogram[tokenSyllables.length] != undefined){
+                syllableHistogram[tokenSyllables.length] += 1;    
+            } else {
+                syllableHistogram[tokenSyllables.length] = 1;
+            }
+        }
+
+        syllableHistogram[0] = 0;
+
+        this.syllableHistogram = syllableHistogram;
+            
+        return this.syllableHistogram;            
+    }
+
+    //TODO make general method merging it with getsyllableHistogram
+    getSentenceHistogram()
+    {
+        var sentenceHistogram = [];
+
+        for(var sentence in this.content.sentences){
+            var sentenceLength = this.content.sentences[sentence].words.length;
+            if(sentenceHistogram[sentenceLength] != undefined){
+                sentenceHistogram[sentenceLength] += 1;
+            } else {
+                sentenceHistogram[sentenceLength] = 1;
+            }
+        }
+
+        sentenceHistogram[0] = 0;
+
+        this.sentenceHistogram = sentenceHistogram;
+       
+        return this.sentenceHistogram;
+    }
+
+    trimSentences()
+    {
+        return this.content.text.trim().match( /[^\.!\?]+[\.!\?]+/g );
+    }
+
+    trimWordsFromSentence(sentence)
+    {
+        return sentence.replace(/[#!¡¿?\-@\."”“’‘»«*'—%\[\]\|]/g, '').replace(/=/g, ' ').replace(/[0-9]+/g, '').trim().split(/\s+/);
+    }
+
+    isPassive(sentence)
+    {
+        var regex = /\b(es|son|está|están|eran|era|estaba|estaban|fue|fueron|estuvo|estuvieron|ha sido|han sido|ha estado|han estado|había sido|habían sido|había estado|habían estado|será|serán|estará|estarán|habrá sido|habrán sido|habrá estado|habrán estado|sería|serían|estaría|estarían|habría sido|habrían sido|habría estado|habrían estado) ([a-z]+ |)[a-z]+(ado|ados|ido|idos)\b/;
+        
+        return regex.test(sentence);
+    }
+
+    isAdverb(word)
+    {
+        var regex = /[a-zA-Z0-9áéíóúàèìòùñç]+mente\b/;
+
+        return regex.test(word);
+    }
+
     statistics()
     {
-        let wordsArray = [];
-        let sentencesArray = [];
-        let readSpeed = 220; //wpm
+        var wordsArray = [];
+        var sentencesArray = [];
+        var readSpeed = 220; //wpm
         this.content.words = []; // Need to reset, do no remove
         this.content.sentences = [];
         this.content.passiveSentences = 0; // Need to reset, do not remove
         this.content.chars = 0;
         this.content.adverbs = [];
         this.content.spaces = 0;
+        this.content.wordsPerSentence = 0;
 
-        if (this.content.text.length > 0) {
+        if (this.content.text.length > 1) {
 
-            sentencesArray = this.content.text.trim().match( /[^\.!\?]+[\.!\?]+/g );
+            sentencesArray = this.trimSentences();
 
-            for (let i = 0; i < sentencesArray.length; i++) {
+            for (var i = 0; i < sentencesArray.length; i++) {
 
-                wordsArray = sentencesArray[i].trim().split(/\s+/);
+                wordsArray = this.trimWordsFromSentence(sentencesArray[i]);
 
                 this.content.sentences[i] = {
                     value: sentencesArray[i],
                     words: wordsArray,
                     isPassive: false,
-                    adverbs: []
+                    adverbs: [],
                 };
 
                 this.content.words = this.content.words.concat(wordsArray);
 
-                if(/\b(es|son|está|están|eran|era|estaba|estaban|fue|fueron|estuvo|estuvieron|ha sido|han sido|ha estado|han estado|había sido|habían sido|había estado|habían estado|será|serán|estará|estarán|habrá sido|habrán sido|habrá estado|habrán estado|sería|serían|estaría|estarían|habría sido|habrían sido|habría estado|habrían estado) ([a-z]+ |)[a-z]+(ado|ados|ido|idos)\b/.test(sentencesArray[i])) {
+                if(this.isPassive(sentencesArray[i])) {
                     this.content.sentences[i].isPassive = true;
                     this.content.passiveSentences++;
                 }
@@ -73,7 +396,7 @@ class Lorca {
                 for (let k = 0; k < wordsArray.length; k += 1) {
                     this.content.chars += wordsArray[k].length;
 
-                    if(/[a-zA-Z0-9áéíóúàèìòùñç]+mente\b/.test(wordsArray[k])){
+                    if(this.isAdverb(wordsArray[k])){
                         this.content.adverbs.push(wordsArray[k]);
                         this.content.sentences[i].adverbs.push(wordsArray[k]);
                     }
@@ -91,10 +414,7 @@ class Lorca {
         this.content.syllables = silabas(this.content.text).syllables();
         this.content.sentences.length = Object.keys(this.content.sentences).length;
 
-        //infz
-        let syllablesPerWord = this.content.syllables.length/this.content.words.length;
-        let wordsPerSentence = this.content.words.length/this.content.sentences.length;
-        this.infz.value = Math.round(Math.abs(206.835 - 62.3*syllablesPerWord - wordsPerSentence));
+        this.infz.value = this.INFZ();
 
         if(this.infz.value > 0 && this.infz.value < 40){
             this.infz.level = "Muy difícil";
@@ -116,8 +436,6 @@ class Lorca {
 
         return this;
     }
-
-
 }
 
 function silabas(word) {
