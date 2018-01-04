@@ -325,10 +325,12 @@ class Lorca {
             } else {
                 sentenceHistogram[sentenceLength] = 1;
             }
+            if(sentenceLength > 30){
+            //console.log(this.content.sentences[sentence].value, sentenceLength);
+            }
         }
 
         sentenceHistogram[0] = 0;
-
         this.sentenceHistogram = sentenceHistogram;
        
         return this.sentenceHistogram;

@@ -46,9 +46,23 @@ var extension = editor.getExtensionByName('auto-highlight');
 
 var lorca = new Lorca;
 
+var writeAnalyseButton = $('#write-analyze-button');
+var hideOnWritting = $('.hide-on-writting');
+
+writeAnalyseButton.click(function(){
+    if(writeAnalyseButton.text() == 'Escribir'){
+        writeAnalyseButton.text('Analizar');
+        hideOnWritting.toggleClass('hidden');
+    } else {
+        writeAnalyseButton.text('Escribir');
+        hideOnWritting.toggleClass('hidden');
+        fullanalysis();
+    }
+});
+
 $('#analysis-button').click(function () {
     let text = lorca.clean(editor.getContent()).content.text;
-    console.log(text.length);
+  
     $.post(
         'https://apiv2.indico.io/apis/multiapi?apis=sentiment,emotion,political',
         JSON.stringify({
@@ -73,7 +87,7 @@ $('#analysis-button').click(function () {
     });
 });
 
-editor.on($('.editable'), 'keyup', function(event){
+function fullanalysis(){
 
     setTimeout(function(){
         $('#save-status').empty();
@@ -88,19 +102,23 @@ editor.on($('.editable'), 'keyup', function(event){
         //console.log("space");
     }
     
-    let plainText = lorca.clean(editor.getContent()).statistics();
+    var plainText = lorca.clean(editor.getContent()).statistics();
     var list = plainText.getAllFrequencies();
     plainText.getOutlierWordFrequency();
     plainText.getUniqueWordFrequency();
     plainText.getAbsoluteWordFrequency();
     plainText.getPronounsFrequency();
-    plainText.getSyllableHistogram();
-    plainText.getSentenceHistogram();
+    //plainText.getSyllableHistogram();
+    //console.log(plainText.getSentenceHistogram());
     //console.log(plainText);
-    $('#word-frequency').text('');
     
-    for(const word in list){
-        $('#word-frequency').append(word + '</br>');
+    $('#key-words').text('No hay palabras suficientes');
+   
+    if(plainText.content.words.length > 40){
+        $('#key-words').text('');
+        for(const word in list){
+            $('#key-words').append('<div class="key-word">' + word + '</div>');
+        }
     }
     
 
@@ -125,7 +143,6 @@ editor.on($('.editable'), 'keyup', function(event){
     plainText.content.passiveSentences > 0
     ? $('#passive-sentences').html(plainText.content.passiveSentences)
     : $('#passive-sentences').html(0);
-
 
     function moveBar() {
         var currentPercentage = Math.round(100*$('#progress-value').width()/$('.meter').width());
@@ -153,6 +170,10 @@ editor.on($('.editable'), 'keyup', function(event){
             }
         }
     }
-    moveBar();
 
+    moveBar();
+}
+
+editor.on($('.editable'), 'keyup', function(event){
+    fullanalysis();
 });

@@ -18,61 +18,71 @@
             <div id="save-status"></div>
         </div>
     </header>
+    
     <div class="container" id="container">
         <div class="side-column">
-            <div id="word-frequency"></div>
+            <div class="hide-on-writting">
+                <div class="column-wrapper">
+                    <div class="column-title">Palabras clave</div>
+                    <div id="key-words">No hay palabras suficientes</div>
+                </div>
+            </div>
         </div>
+
         <div id="caret" class="editable"></div>
-        <div id="display" class="side-column">
-            <div class="column-wrapper">
-                <div class="column-title">Legibilidad</div>
-                <div class="meter">
-                    <span id="progress-value"></span>
-                </div>
-                <div id="level">Muy fácil</div>
-            </div>
-            <div class="column-wrapper">
-                <div><strong id="time">0</strong><span> </span><span id="units">segundos</span></div>
-                <div><strong id="words">0</strong> palabras</div>
-                <div><strong id="sentences">0</strong> frases</div>
-                <div><strong id="adverbs">0</strong> adverbios</div>
-                <div><strong id="passive-sentences">0</strong> frases pasivas</div>
-            </div>
-            <div class="column-wrapper">
-                <div class="column-title">Avanzado</div>
-                    <div><strong id="infz">0</strong> INFZ</div>
-                    <div><strong id="outlier">0</strong><strong>%</strong> raras</div>
-                    <div><strong id="unique">0</strong><strong>%</strong> aparecen 1 vez</div>
-                    <div><strong id="absolute">0</strong><strong>%</strong> absolutas</div>
-                    <div><strong id="words-per-sentence">0</strong> p/f</div>
-                    <div><strong id="syllables-per-word">0</strong> s/p</div>
-                    <div><strong id="pronouns">0</strong><strong>%</strong> pronombres</div>
-            </div>
-
-            <div class="external-analysis hidden">
-                <button id="analysis-button">Analizar</button>
-
-                <div class="column-wrapper">
-                    <div class="column-title">Emoción</div>
-                    <div><strong id="anger">0%</strong> enfadado</div>
-                    <div><strong id="fear">0%</strong> asustado</div>
-                    <div><strong id="joy">0%</strong> alegre</div>
-                    <div><strong id="sadness">0%</strong> triste</div>
-                    <div><strong id="surprise">0%</strong> sorprendido</div>
-                </div>
-                <div class="column-wrapper">
-                    <div class="column-title">Político</div>
-                    <div><strong id="conservative">0%</strong> conservador</div>
-                    <div><strong id="green">0%</strong> verde</div>
-                    <div><strong id="liberal">0%</strong> liberalista</div>
-                    <div><strong id="libertarian">0%</strong> libertarista</div>
-                </div>
-                <div class="column-wrapper">
-                    <div class="column-title">Sentimiento</div>
-                    <div><strong id="sentiment">0%</strong> positivo</div>
-                </div>
-            </div>
             
+        <div id="display" class="side-column">
+            <button id="write-analyze-button">Escribir</button>
+            <div class="hide-on-writting">
+                <div class="column-wrapper">
+                    <div class="column-title">Legibilidad</div>
+                    <div class="meter">
+                        <span id="progress-value"></span>
+                    </div>
+                    <div id="level">Muy fácil</div>
+                </div>
+                <div class="column-wrapper">
+                    <div><strong id="time">0</strong><span> </span><span id="units">segundos</span></div>
+                    <div><strong id="words">0</strong> palabras</div>
+                    <div><strong id="sentences">0</strong> frases</div>
+                    <div><strong id="adverbs">0</strong> adverbios</div>
+                    <div><strong id="passive-sentences">0</strong> frases pasivas</div>
+                </div>
+                <div class="column-wrapper">
+                    <div class="column-title">Avanzado</div>
+                        <div><strong id="infz">0</strong> INFZ</div>
+                        <div><strong id="outlier">0</strong><strong>%</strong> raras</div>
+                        <div><strong id="unique">0</strong><strong>%</strong> aparecen 1 vez</div>
+                        <div><strong id="absolute">0</strong><strong>%</strong> absolutas</div>
+                        <div><strong id="words-per-sentence">0</strong> p/f</div>
+                        <div><strong id="syllables-per-word">0</strong> s/p</div>
+                        <div><strong id="pronouns">0</strong><strong>%</strong> pronombres</div>
+                </div>
+
+                <div class="external-analysis hidden">
+                    <button id="analysis-button">Analizar</button>
+
+                    <div class="column-wrapper">
+                        <div class="column-title">Emoción</div>
+                        <div><strong id="anger">0%</strong> enfadado</div>
+                        <div><strong id="fear">0%</strong> asustado</div>
+                        <div><strong id="joy">0%</strong> alegre</div>
+                        <div><strong id="sadness">0%</strong> triste</div>
+                        <div><strong id="surprise">0%</strong> sorprendido</div>
+                    </div>
+                    <div class="column-wrapper">
+                        <div class="column-title">Político</div>
+                        <div><strong id="conservative">0%</strong> conservador</div>
+                        <div><strong id="green">0%</strong> verde</div>
+                        <div><strong id="liberal">0%</strong> liberalista</div>
+                        <div><strong id="libertarian">0%</strong> libertarista</div>
+                    </div>
+                    <div class="column-wrapper">
+                        <div class="column-title">Sentimiento</div>
+                        <div><strong id="sentiment">0%</strong> positivo</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

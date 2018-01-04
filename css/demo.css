@@ -82,7 +82,6 @@ strong {
 
 button {
     padding: 8px;
-    margin: 16px;
     background-color: white;
     border-radius: 6px;
     border: 2px solid lightgrey;
@@ -141,9 +140,9 @@ button {
 .meter {
     height: 3px;
     position: relative;
-    margin: 0 0 10px 0;
+    margin: 0 32px 10px 0;
     background-color: #ebebeb;
-    max-width: 80%;
+    max-width: 200px;
 }
 
 .meter > span {
@@ -180,11 +179,9 @@ button {
     min-height: 90vh;
     background-color: white;
     margin-top: 11px;
-    /*border: 1px lightgrey solid;*/
     padding: 50px;
     border-radius: 7px;
     flex: 0 0 700px;
-
     -webkit-box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.05);
     -moz-box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.05);
     box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.05);
@@ -192,26 +189,25 @@ button {
 
 #display {
     font-size: 12px;
-    padding-left: 32px;
-    padding-top: 20px;
+    padding-left: 9px;
     padding-right: 0;
     margin-top: 11px;
     color: #a6a6a6;
     line-height: 17px;
     letter-spacing: 0.3px;
-    font-family: 'Source Sans Pro', sans-serif;
 }
 
 .container {
     display: -webkit-flex; /* Safari */
     display: flex;
     -webkit-justify-content: center; /* Safari */
-    justify-content:         center;
+    justify-content: center;
 }
 
 .side-column {
     flex-basis: 100%;
-    padding: 15px;
+    margin: 16px 24px;
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
 .passive {
@@ -242,8 +238,21 @@ button {
     border-bottom: 2px solid #72be72;
 }
 
-#word-frequency {
-    font-size: 12px;
-    font-family: 'Source Sans Pro', sans-serif;
+#key-words {
     color: #a6a6a6;
+    max-width: 75%;
+    font-size: 12px;
+}
+
+.key-word {
+    font-size: 12px;
+    border: 2px solid lightgray;
+    border-radius: 5px;
+    padding: 4px 10px;
+    margin: 5px;
+    display: inline-flex;
+}
+
+#write-analyze-button {
+    margin-bottom: 16px;
 }
