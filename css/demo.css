@@ -256,3 +256,21 @@ button {
 #write-analyze-button {
     margin-bottom: 16px;
 }
+
+.tip {
+    border-radius: 5px;
+    padding: 5px;
+    margin: 7px 0px;
+}
+
+.long-sentence-tip {
+    border: 2px solid #ff6262;
+}
+
+.adverb-tip {
+    border: 2px solid #72be72;
+}
+
+.passive-tip {
+    border: 2px solid orange;
+}

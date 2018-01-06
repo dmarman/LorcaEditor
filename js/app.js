@@ -144,21 +144,24 @@ function fullanalysis(){
     plainText.content.passiveSentences > 0
     ? $('#passive-sentences').html(plainText.content.passiveSentences)
     : $('#passive-sentences').html(0);
-    console.log(plainText);
+    //console.log(plainText);
 
     function giveTip(){
         tipList.empty();
+        tipList.append('<div class="tip long-sentence-tip">Estas frases tienen más de 30 palabras, acórtalas:</div>');
+        tipList.append('<div class="tip adverb-tip">Estos adverbios son innecesarios:</div>');
         for(var sentence in plainText.content.sentences){
             if(plainText.content.sentences[sentence].words.length > 30){
-                tipList.append('- "' + plainText.content.sentences[sentence].value.slice(0, 20) + '..." ' + 'tiene más de 30 palabras, intenta acortarla.<br><br>');
+                $('.long-sentence-tip').append('<div>- "' + plainText.content.sentences[sentence].value.slice(0, 40) + '..."</div>');
+                //tipList.append('- "' + plainText.content.sentences[sentence].value.slice(0, 20) + '..." ' + 'tiene más de 30 palabras, intenta acortarla.');
             }
         }
         for(var adverb in plainText.content.adverbs){
-            tipList.append("- " + plainText.content.adverbs[adverb] + ' es un adverbio innecesario. Busca un verbo más fuerte o borralo.<br><br>');
+            $('.adverb-tip').append('<div>- ' + plainText.content.adverbs[adverb] + '</div>');
         }
         for(var sentence in plainText.content.sentences){
             if(plainText.content.sentences[sentence].isPassive){
-                tipList.append('- "' + plainText.content.sentences[sentence].value.slice(0, 20) + '..." ' + 'es una frase pasiva, transformala en activa.<br><br>');
+                tipList.append('<div class="tip passive-tip">- "' + plainText.content.sentences[sentence].value.slice(0, 20) + '..." ' + 'es una frase pasiva, transformala en activa.');
             }
         }
     }
