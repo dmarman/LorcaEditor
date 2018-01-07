@@ -137,33 +137,44 @@ function fullanalysis(){
     $('#syllables-per-word').text(plainText.syllablesPerWord.toPrecision(3));
     $('#pronouns').text(Math.round(100*plainText.pronouns.percentage.total));
 
-    plainText.content.adverbs.length > 0
-    ? $('#adverbs').html(plainText.content.adverbs.length)
-    : $('#adverbs').html(0);
+    if(plainText.content.adverbs.length > 0){
+        $('#adverbs').html(plainText.content.adverbs.length);
+        $('#adverb-list').empty();
+        $('#adverb-list').append('<div class="tip adverb-tip">Estos adverbios son innecesarios:</div>');
+        for(var adverb in plainText.content.adverbs){
+            $('.adverb-tip').append('<div>- ' + plainText.content.adverbs[adverb] + '</div>');
+        }
+    } else {
+        $('#adverbs').html(0);
+        $('#adverb-list').empty();
+    }
     
-    plainText.content.passiveSentences > 0
-    ? $('#passive-sentences').html(plainText.content.passiveSentences)
-    : $('#passive-sentences').html(0);
-    //console.log(plainText);
+    if(plainText.content.passiveSentences > 0){
+        $('#passive-sentences').html(plainText.content.passiveSentences);
+        $('#passive-list').empty();
+        $('#passive-list').append('<div class="tip passive-tip">Convierte estas frases a activas:</div>');
+        for(var sentence in plainText.content.sentences){
+            if(plainText.content.sentences[sentence].isPassive){
+                $('.passive-tip').append('<div>-' + plainText.content.sentences[sentence].value.slice(0, 20) + '..."</div>' );
+            }
+        }
+        
+    } else {
+        $('#passive-sentences').html(0);
+        $('#passive-list').empty();
+    }
 
     function giveTip(){
-        tipList.empty();
-        tipList.append('<div class="tip long-sentence-tip">Estas frases tienen más de 30 palabras, acórtalas:</div>');
-        tipList.append('<div class="tip adverb-tip">Estos adverbios son innecesarios:</div>');
+        $('.long-sentence-tip').empty();
+        //$('.passive-tip').empty(); 
+        //tipList.append('<div class="tip long-sentence-tip">Estas frases tienen más de 30 palabras, acórtalas:</div>');
         for(var sentence in plainText.content.sentences){
             if(plainText.content.sentences[sentence].words.length > 30){
                 $('.long-sentence-tip').append('<div>- "' + plainText.content.sentences[sentence].value.slice(0, 40) + '..."</div>');
                 //tipList.append('- "' + plainText.content.sentences[sentence].value.slice(0, 20) + '..." ' + 'tiene más de 30 palabras, intenta acortarla.');
             }
         }
-        for(var adverb in plainText.content.adverbs){
-            $('.adverb-tip').append('<div>- ' + plainText.content.adverbs[adverb] + '</div>');
-        }
-        for(var sentence in plainText.content.sentences){
-            if(plainText.content.sentences[sentence].isPassive){
-                tipList.append('<div class="tip passive-tip">- "' + plainText.content.sentences[sentence].value.slice(0, 20) + '..." ' + 'es una frase pasiva, transformala en activa.');
-            }
-        }
+        
     }
     giveTip();
 
