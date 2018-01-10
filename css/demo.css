@@ -261,6 +261,8 @@ button {
     border-radius: 5px;
     padding: 5px;
     margin: 7px 0px;
+    min-width: 66%;
+    display: inline-block;
 }
 
 .long-sentence-tip {

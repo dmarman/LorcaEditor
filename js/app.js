@@ -155,7 +155,7 @@ function fullanalysis(){
         $('#passive-list').append('<div class="tip passive-tip">Convierte estas frases a activas:</div>');
         for(var sentence in plainText.content.sentences){
             if(plainText.content.sentences[sentence].isPassive){
-                $('.passive-tip').append('<div>-' + plainText.content.sentences[sentence].value.slice(0, 20) + '..."</div>' );
+                $('.passive-tip').append('<div>-' + plainText.content.sentences[sentence].value.slice(0, 40) + '..."</div>' );
             }
         }
         
@@ -165,15 +165,28 @@ function fullanalysis(){
     }
 
     function giveTip(){
-        $('.long-sentence-tip').empty();
-        //$('.passive-tip').empty(); 
-        //tipList.append('<div class="tip long-sentence-tip">Estas frases tienen más de 30 palabras, acórtalas:</div>');
+     
         for(var sentence in plainText.content.sentences){
             if(plainText.content.sentences[sentence].words.length > 30){
-                $('.long-sentence-tip').append('<div>- "' + plainText.content.sentences[sentence].value.slice(0, 40) + '..."</div>');
-                //tipList.append('- "' + plainText.content.sentences[sentence].value.slice(0, 20) + '..." ' + 'tiene más de 30 palabras, intenta acortarla.');
+                console.log('sentence');
+                var shouldAddLongTip = true;
             }
         }
+
+        if(shouldAddLongTip){
+            $('#long-sentence-list').empty();
+
+            $('#long-sentence-list').append('<div class="tip long-sentence-tip">Estas frases tienen más de 30 palabras:</div>');
+            for(var sentence in plainText.content.sentences){
+                if(plainText.content.sentences[sentence].words.length > 30){
+                    $('.long-sentence-tip').append('<div>- "' + plainText.content.sentences[sentence].value.slice(0, 40) + '..."</div>');
+                    
+                }
+            }
+        }
+        
+
+
         
     }
     giveTip();
