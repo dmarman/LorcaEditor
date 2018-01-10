@@ -61,6 +61,7 @@ writeAnalyseButton.click(function(){
     }
 });
 
+// Text analysis API call
 $('#analysis-button').click(function () {
     let text = lorca.clean(editor.getContent()).content.text;
   
@@ -89,7 +90,7 @@ $('#analysis-button').click(function () {
 });
 
 function fullanalysis(){
-
+    // Auto save
     setTimeout(function(){
         $('#save-status').empty();
     }, 500);
@@ -99,10 +100,7 @@ function fullanalysis(){
         $('#save-status').text('Guardado');
     }, 1200);
 
-    if(event.keyCode == 32){
-        //console.log("space");
-    }
-    
+    // Text análisis
     var plainText = lorca.clean(editor.getContent()).statistics();
     var list = plainText.getAllFrequencies();
     plainText.getOutlierWordFrequency();
@@ -113,8 +111,8 @@ function fullanalysis(){
     //console.log(plainText.getSentenceHistogram());
     //console.log(plainText);
     
+    // Key words
     $('#key-words').text('No hay palabras suficientes');
-   
     if(plainText.content.words.length > 40){
         $('#key-words').text('');
         for(const word in list){
@@ -122,13 +120,14 @@ function fullanalysis(){
         }
     }
     
-
+    // Statistics display
     $('#time').text(plainText.time.value);
     $('#units').text(plainText.time.units);
     $('#level').text(plainText.infz.level);
     $('#words').html(plainText.content.words.length);
     $('#sentences').html(plainText.content.sentences.length);
 
+    // Advanced statistics display
     $('#infz').text(plainText.infz.value);
     $('#outlier').text(Math.round(100*plainText.outlierWordFrecuency));
     $('#unique').text(Math.round(100*plainText.uniqueWordFrecuency));
@@ -137,6 +136,7 @@ function fullanalysis(){
     $('#syllables-per-word').text(plainText.syllablesPerWord.toPrecision(3));
     $('#pronouns').text(Math.round(100*plainText.pronouns.percentage.total));
 
+    // Tip giver
     if(plainText.content.adverbs.length > 0){
         $('#adverbs').html(plainText.content.adverbs.length);
         $('#adverb-list').empty();
@@ -153,6 +153,7 @@ function fullanalysis(){
         $('#passive-sentences').html(plainText.content.passiveSentences);
         $('#passive-list').empty();
         $('#passive-list').append('<div class="tip passive-tip">Convierte estas frases a activas:</div>');
+
         for(var sentence in plainText.content.sentences){
             if(plainText.content.sentences[sentence].isPassive){
                 $('.passive-tip').append('<div>-' + plainText.content.sentences[sentence].value.slice(0, 40) + '..."</div>' );
@@ -163,34 +164,25 @@ function fullanalysis(){
         $('#passive-sentences').html(0);
         $('#passive-list').empty();
     }
+  
+    for(var sentence in plainText.content.sentences){
+        if(plainText.content.sentences[sentence].words.length > 30){
+            var shouldAddLongTip = true;
+        }
+    }
+    if(shouldAddLongTip){
+        $('#long-sentence-list').empty();
 
-    function giveTip(){
-     
+        $('#long-sentence-list').append('<div class="tip long-sentence-tip">Estas frases tienen más de 30 palabras:</div>');
         for(var sentence in plainText.content.sentences){
             if(plainText.content.sentences[sentence].words.length > 30){
-                console.log('sentence');
-                var shouldAddLongTip = true;
+                $('.long-sentence-tip').append('<div>- "' + plainText.content.sentences[sentence].value.slice(0, 40) + '..."</div>');
+                
             }
         }
-
-        if(shouldAddLongTip){
-            $('#long-sentence-list').empty();
-
-            $('#long-sentence-list').append('<div class="tip long-sentence-tip">Estas frases tienen más de 30 palabras:</div>');
-            for(var sentence in plainText.content.sentences){
-                if(plainText.content.sentences[sentence].words.length > 30){
-                    $('.long-sentence-tip').append('<div>- "' + plainText.content.sentences[sentence].value.slice(0, 40) + '..."</div>');
-                    
-                }
-            }
-        }
-        
-
-
-        
     }
-    giveTip();
-
+            
+    // Progress bar animation
     function moveBar() {
         var currentPercentage = Math.round(100*$('#progress-value').width()/$('.meter').width());
         var target = plainText.infz.percentage;
